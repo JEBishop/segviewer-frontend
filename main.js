@@ -24,7 +24,7 @@ $(document).ready(function() {
     function reAuthorize() {
         const auth_code = localStorage.getItem("refresh_token");
         $.ajax({
-            url: `https://segviewer.com/api/auth/${auth_code}/refresh_token`,
+            url: `https://rvkmu6zbm5.execute-api.us-east-1.amazonaws.com/Prod/${auth_code}/refresh_token`,
             method: "GET",    
             dataType: "json",
             error: function(xhr, status, error) {
