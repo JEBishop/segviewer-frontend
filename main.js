@@ -35,6 +35,9 @@ $(document).ready(function() {
                 console.log("error: " + error);
             },
             complete: function(response) {
+                console.log(response);
+                console.log(response.responseJSON);
+                console.log(response["responseJSON"]);
                 localStorage.setItem("access_token", response["responseJSON"]["access_token"]);
                 localStorage.setItem("refresh_token", response["responseJSON"]["refresh_token"]);
                 getStarredSegments(response["responseJSON"]["access_token"]);
