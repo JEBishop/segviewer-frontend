@@ -75,14 +75,14 @@ $(document).ready(function() {
                         polyline: ""
                     }
                     latlngList.push(new google.maps.LatLng(segment.start_lat, segment.start_lng));
-                    mapSegment(getPolyline(token, segment));
+                    mapSegment(await getPolyline(token, segment));
                 }
                 getNewCenter(latlngList);
             }
         });
     }
 
-    function getPolyline(token, segment) {
+    async function getPolyline(token, segment) {
         /* 
             this is going to hit the 100 calls/15 min rate limit real fast
             store id and polyline locally to save some calls on repeat users 
