@@ -185,7 +185,7 @@ $(document).ready(function() {
             bounds.extend(latlng[i]);
         }
 
-        map.setCenter(bounds.getCenter());
+        map.setCenter(parseFloat(bounds.getCenter()));
         map.fitBounds(bounds);
     }
 });
