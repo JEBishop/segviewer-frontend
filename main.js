@@ -28,16 +28,9 @@ $(document).ready(function() {
             method: "GET",    
             dataType: "json",
             error: function(xhr, status, error) {
-                console.log("readyState: " + xhr.readyState);
-                console.log("responseText: "+ xhr.responseText);
-                console.log("status: " + xhr.status);
-                console.log("text status: " + status);
-                console.log("error: " + error);
+                console.log(`error: ${xhr.responseText}`);
             },
             complete: function(response) {
-                console.log(response);
-                console.log(response.responseJSON);
-                console.log(response["responseJSON"]);
                 localStorage.setItem("access_token", response["responseJSON"]["access_token"]);
                 localStorage.setItem("refresh_token", response["responseJSON"]["refresh_token"]);
                 getStarredSegments(response["responseJSON"]["access_token"]);
@@ -57,7 +50,7 @@ $(document).ready(function() {
                 access_token: token
             },
             error: function(xhr, status, error) {
-                console.log(`error:${xhr.responseText}`);
+                console.log(`error: ${xhr.responseText}`);
             },
             complete: function(response) {
                 let segArr = response["responseJSON"];
@@ -68,10 +61,12 @@ $(document).ready(function() {
                         name: segArr[i]["name"],
                         distance: segArr[i]["distance"],
                         average_grade: segArr[i]["average_grade"],
-                        start_lat: segArr[i]["start_latitude"], 
-                        start_lng: segArr[i]["start_longitude"],
-                        end_lat: segArr[i]["end_latitude"],
-                        end_lng: segArr[i]["end_longitude"],
+                        start_lat: segArr[i]["start_latlng"][0], 
+                        start_lng: segArr[i]["start_latlng"][1], 
+                        end_lat: segArr[i]["end_latlng"][0],
+                        end_lng: segArr[i]["end_latlng"][1],
+                        is_kom: segArr[i]["athlete_pr_effort"] ? 
+                            segArr[i]["athlete_pr_effort"]["is_kom"] : false,
                         polyline: ""
                     }
                     latlngList.push(new google.maps.LatLng(segment.start_lat, segment.start_lng));
@@ -96,12 +91,11 @@ $(document).ready(function() {
                     access_token: token
                 },
                 error: function(xhr, status, error) {
-                    console.log(`error:${xhr.responseText}`);
+                    console.log(`error: ${xhr.responseText}`);
                 },
                 complete: function(response) {
                     segment.polyline = response["responseJSON"]["map"]["polyline"];
                     localStorage.setItem(segment.id, JSON.stringify(segment));
-                    getPolyline(token, segment);
                 }
             });
         } else {
@@ -125,6 +119,10 @@ $(document).ready(function() {
             map
         });
 
+        if(segment.is_kom) {
+            line.strokeColor = "#FFD700";
+        }
+
         google.maps.event.addListener(line, 'click', function() {
             tooltip.setPosition(new google.maps.LatLng(segment.start_lat, segment.start_lng));
             tooltip.setContent(
@@ -134,7 +132,7 @@ $(document).ready(function() {
                 "&#37;</span><br/><a href='" + "https://www.strava.com/segments/" + 
                 segment.id + "' target='_blank' rel='noopener noreferrer'>" + "View on Strava</a>");
             tooltip.open(map);
-        })
+        });
 
         //red market at end
         new google.maps.Marker({
@@ -180,12 +178,11 @@ $(document).ready(function() {
     
     function getNewCenter(latlng) {
         var bounds = new google.maps.LatLngBounds();
-
         for(var i = 0; i < latlng.length; i++) {
             bounds.extend(latlng[i]);
         }
 
-        map.setCenter(parseFloat(bounds.getCenter()));
+        map.setCenter(bounds.getCenter());
         map.fitBounds(bounds);
     }
 });
